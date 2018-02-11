@@ -1,0 +1,26 @@
+{
+  "name": "news_api",
+  "version": "1.0.0",
+  "description": "Firs task - ES2015 Css was taken from https://w3layouts.com/",
+  "main": "index.js",
+  "scripts": {
+    "build": "babel src -d dist --presets es2015",
+    "watch": "babel src -d dist --presets es2015 -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/juggleross/juggleross.github.io.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/juggleross/juggleross.github.io/issues"
+  },
+  "homepage": "https://github.com/juggleross/juggleross.github.io#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1"
+  }
+}
