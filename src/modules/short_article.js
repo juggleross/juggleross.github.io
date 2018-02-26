@@ -1,49 +1,72 @@
 (() => {
+  function componentFactory() {
+    this.createComponent = function(type, jsonArticle, shortArticle) {
+      let component;
 
-  class ShortArticle {
-    constructor(popularAsideBlock, jsonArticle) {
-      this.popularAsideBlock = popularAsideBlock;
+      if(type === 'title') {
+        component = new AddTitle(jsonArticle, shortArticle);
+      } else if(type === 'description') {
+        component = new AddShortDescription(jsonArticle, shortArticle);
+      } else if(type === 'publishedAt') {
+        component = new AddPublishedAt(jsonArticle, shortArticle);
+      } else if(type === 'underscore') {
+        component = new AddUnderscore(jsonArticle, shortArticle);
+      }
 
-      this.shortArticle = document.createElement('a');
-      this.shortArticle.className = "editor text-center";
-      this.shortArticle.href = jsonArticle.url;
-
-      if(jsonArticle.urlToImage != null) this.popularAsideBlock.appendChild(this.shortArticle);
-      this.jsonArticle = jsonArticle;
+      return component;
     }
+  }
 
-    addShortArticle() {
-      this.addTitle();
-      this.addShortDescription();
-      this.addPublishedAt();
-      this.addUnderscore();
+  function shortArticleFactory() {
+    this.createShortArticle = function(popularAsideBlock, jsonArticle, type) {
+      let shortArticle = new AddShortArticle(popularAsideBlock, jsonArticle);
+      let factory = new componentFactory();
+
+      let componentNames = ['title', 'description', 'publishedAt', 'underscore'];
+
+      componentNames.forEach(function(componentName) {
+        shortArticle.appendChild(new factory.createComponent(componentName, jsonArticle, shortArticle));
+      })
+
+      return shortArticle;
     }
+  }
+  let AddShortArticle = function(popularAsideBlock, jsonArticle) {
+    let shortArticle = document.createElement('a');
+    shortArticle.className = "editor text-center";
+    shortArticle.href = jsonArticle.url;
 
-    addTitle() {
-      let title = document.createElement('a');
-      title.textContent = this.jsonArticle.title;
-      title.className = 'title';
+    popularAsideBlock.appendChild(shortArticle);
 
-      this.shortArticle.appendChild(title);
-    }
+    return shortArticle;
+  }
 
-    addShortDescription() {
-      let shortDescription = document.createElement('p');
-      shortDescription.textContent = this.jsonArticle.description.substring(0, 100) + '...';
+  let AddTitle = function(jsonArticle, shortArticle) {
+    let title = document.createElement('a');
+    title.textContent = jsonArticle.title;
+    title.className = 'title';
 
-      this.shortArticle.appendChild(shortDescription);
-    }
+    return title;
+  };
 
-    addPublishedAt() {
-      let publishedAt = document.createElement('label');
-      publishedAt.textContent = this.jsonArticle.publishedAt;
-      this.shortArticle.appendChild(publishedAt);
-    }
+  let AddShortDescription = function(jsonArticle, shortArticle) {
+    let shortDescription = document.createElement('p');
+    shortDescription.textContent = jsonArticle.description.substring(0, 100) + '...';
 
-    addUnderscore() {
-      let underscore = document.createElement('span');
-      this.shortArticle.appendChild(underscore);
-    }
+    return shortDescription;
+  }
+
+  let AddPublishedAt = function(jsonArticle, shortArticle) {
+    let publishedAt = document.createElement('label');
+    publishedAt.textContent = jsonArticle.publishedAt;
+
+    return publishedAt;
+  }
+
+  let AddUnderscore = function(jsonArticle, shortArticle) {
+    let underscore = document.createElement('span');
+
+    return underscore;
   }
 
   const url = 'https://newsapi.org/v2/everything?' +
@@ -59,7 +82,7 @@
       const popularAsideBlock = document.getElementById('popular-aside-block');
 
       return data.articles.map((jsonArticle) => {
-        new ShortArticle(popularAsideBlock, jsonArticle).addShortArticle();
+        new shortArticleFactory().createShortArticle(popularAsideBlock, jsonArticle);
       })
     })
 
