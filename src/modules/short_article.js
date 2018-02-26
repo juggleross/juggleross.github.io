@@ -17,12 +17,25 @@
     }
   }
 
-  function shortArticleFactory() {
-    this.createShortArticle = function(popularAsideBlock, jsonArticle, type) {
+  function DecoratedShortArticle() {
+    this.createOnlyTitle = function(popularAsideBlock, jsonArticle) {
       let shortArticle = new AddShortArticle(popularAsideBlock, jsonArticle);
       let factory = new componentFactory();
 
-      let componentNames = ['title', 'description', 'publishedAt', 'underscore'];
+      let componentNames = ['title', 'underscore'];
+
+      componentNames.forEach(function(componentName) {
+        shortArticle.appendChild(new factory.createComponent(componentName, jsonArticle, shortArticle));
+      })
+
+      return shortArticle;
+    },
+
+    this.createOnlyDescription = function(popularAsideBlock, jsonArticle) {
+      let shortArticle = new AddShortArticle(popularAsideBlock, jsonArticle);
+      let factory = new componentFactory();
+
+      let componentNames = ['description', 'underscore'];
 
       componentNames.forEach(function(componentName) {
         shortArticle.appendChild(new factory.createComponent(componentName, jsonArticle, shortArticle));
@@ -31,6 +44,7 @@
       return shortArticle;
     }
   }
+
   let AddShortArticle = function(popularAsideBlock, jsonArticle) {
     let shortArticle = document.createElement('a');
     shortArticle.className = "editor text-center";
@@ -82,7 +96,8 @@
       const popularAsideBlock = document.getElementById('popular-aside-block');
 
       return data.articles.map((jsonArticle) => {
-        new shortArticleFactory().createShortArticle(popularAsideBlock, jsonArticle);
+        new DecoratedShortArticle().createOnlyTitle(popularAsideBlock, jsonArticle);
+        new DecoratedShortArticle().createOnlyDescription(popularAsideBlock, jsonArticle);
       })
     })
 
