@@ -17,44 +17,6 @@
     }
   }
 
-  function DecoratedShortArticle() {
-    this.createOnlyTitle = function(popularAsideBlock, jsonArticle) {
-      let shortArticle = new AddShortArticle(popularAsideBlock, jsonArticle);
-      let factory = new componentFactory();
-
-      let componentNames = ['title', 'underscore'];
-
-      componentNames.forEach(function(componentName) {
-        shortArticle.appendChild(new factory.createComponent(componentName, jsonArticle, shortArticle));
-      })
-
-      return shortArticle;
-    },
-
-    this.createOnlyDescription = function(popularAsideBlock, jsonArticle) {
-      let shortArticle = new AddShortArticle(popularAsideBlock, jsonArticle);
-      let factory = new componentFactory();
-
-      let componentNames = ['description', 'underscore'];
-
-      componentNames.forEach(function(componentName) {
-        shortArticle.appendChild(new factory.createComponent(componentName, jsonArticle, shortArticle));
-      })
-
-      return shortArticle;
-    }
-  }
-
-  let AddShortArticle = function(popularAsideBlock, jsonArticle) {
-    let shortArticle = document.createElement('a');
-    shortArticle.className = "editor text-center";
-    shortArticle.href = jsonArticle.url;
-
-    popularAsideBlock.appendChild(shortArticle);
-
-    return shortArticle;
-  }
-
   let AddTitle = function(jsonArticle, shortArticle) {
     let title = document.createElement('a');
     title.textContent = jsonArticle.title;
@@ -83,6 +45,59 @@
     return underscore;
   }
 
+  class DecoratedShortArticle {
+    constructor(popularAsideBlock, jsonArticle) {
+      this.popularAsideBlock = popularAsideBlock;
+      this.jsonArticle = jsonArticle;
+    }
+
+    createStructureFor(componentNames) {
+      let shortArticle = new AddShortArticle(this.popularAsideBlock, this.jsonArticle);
+      let factory = new componentFactory();
+
+      componentNames.forEach((componentName) => {
+        shortArticle.appendChild(new factory.createComponent(componentName, this.jsonArticle, shortArticle));
+      })
+
+      return shortArticle;
+    }
+
+    createOnlyTitle() {
+      this.createStructureFor(['title','underscore']);
+    }
+
+    createOnlyDescription() {
+      this.createStructureFor(['description','underscore']);
+    }
+
+    createOnlyPublishedAt() {
+      this.createStructureFor(['publishedAt','underscore']);
+    }
+
+    createDoubleUnderscore() {
+      this.createStructureFor(['underscore','underscore']);
+    }
+
+    createFullShortArticle() {
+      this.createStructureFor(['title', 'description', 'publishedAt', 'underscore']);
+    }
+
+    createArticleInAnotherOrder() {
+      this.createStructureFor(['underscore', 'publishedAt', 'description', 'title']);
+    }
+
+  }
+
+  let AddShortArticle = function(popularAsideBlock, jsonArticle) {
+    let shortArticle = document.createElement('a');
+    shortArticle.className = "editor text-center";
+    shortArticle.href = jsonArticle.url;
+
+    popularAsideBlock.appendChild(shortArticle);
+
+    return shortArticle;
+  }
+
   const url = 'https://newsapi.org/v2/everything?' +
           'q=Russia&' +
           'language=ru&' +
@@ -96,8 +111,14 @@
       const popularAsideBlock = document.getElementById('popular-aside-block');
 
       return data.articles.map((jsonArticle) => {
-        new DecoratedShortArticle().createOnlyTitle(popularAsideBlock, jsonArticle);
-        new DecoratedShortArticle().createOnlyDescription(popularAsideBlock, jsonArticle);
+        let shortArticle = new DecoratedShortArticle(popularAsideBlock, jsonArticle);
+
+        shortArticle.createOnlyTitle();
+        shortArticle.createOnlyDescription();
+        shortArticle.createOnlyPublishedAt();
+        shortArticle.createDoubleUnderscore();
+        shortArticle.createFullShortArticle();
+        shortArticle.createArticleInAnotherOrder();
       })
     })
 
